@@ -11,11 +11,18 @@ import {
 } from "../utils/validators/auth.validator.js";
 import { validate } from "../utils/validators/validate.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
+import { upload } from "../middlewares/multer.middleware.js";
 
 const router = Router();
 
 // register router
-router.post("/register", userRegisterValidator(), validate, registerUser);
+router.post(
+  "/register",
+  upload.single("profileImage"),
+  userRegisterValidator(),
+  validate,
+  registerUser
+);
 
 // login router
 router.post("/login", userLoginValidator(), validate, loginUser);

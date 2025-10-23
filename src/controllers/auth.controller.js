@@ -40,10 +40,14 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(409, "User with email or username already exists");
   }
 
+  const profileImageLocalPath = req.file?.path;
+  console.log(profileImageLocalPath);
+
   const user = await User.create({
     name: name.trim(),
     username: username.trim().toLowerCase(),
     email: email.trim().toLowerCase(),
+    profileImage: profileImageLocalPath,
     password,
   });
 

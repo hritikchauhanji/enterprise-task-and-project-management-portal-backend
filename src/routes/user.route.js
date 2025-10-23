@@ -26,7 +26,7 @@ router.post(
 router.get("/current-user", verifyJWT, getCurrentUser);
 
 // update account details router
-router.post(
+router.patch(
   "/update-account",
   verifyJWT,
   updateAccountValidator(),

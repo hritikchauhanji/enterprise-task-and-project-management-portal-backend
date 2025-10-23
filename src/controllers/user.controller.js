@@ -88,7 +88,10 @@ const updateProfileImage = asyncHandler(async (req, res) => {
       !deleteOldProfileImage ||
       deleteOldProfileImage.result === "not found"
     ) {
-      throw new ApiError(500, "Internal server error. Please try again");
+      throw new ApiError(
+        500,
+        "Internal server error. When delete the profileImage from the cloudinary"
+      );
     }
   }
 

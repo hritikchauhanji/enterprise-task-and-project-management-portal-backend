@@ -2,9 +2,34 @@ import { User } from "../models/user.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/apiResponse.js";
-import { USER_COOKIE_EXPIRY } from "../constants.js";
+import {
+  USER_COOKIE_EXPIRY,
+  USER_TEMPORARY_TOKEN_EXPIRY,
+} from "../constants.js";
 import jwt from "jsonwebtoken";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import crypto from "crypto";
+import { sendEmail } from "../utils/emails/sendEmail.js";
+import {
+  forgotPasswordEmailTemplate,
+  forgotPasswordPlainTextTemplate,
+} from "../utils/emails/forgotPasswordTemplate.js";
+
+// generate temporary otp token
+function generateTemporaryOTPToken() {
+  const min = 100000;
+  const max = 999999;
+  const unHashedOTP = crypto.randomInt(min, max + 1).toString();
+
+  const hashedOTP = crypto
+    .createHash("sha256")
+    .update(unHashedOTP)
+    .digest("hex");
+
+  const tokenExpiry = Date.now() + USER_TEMPORARY_TOKEN_EXPIRY;
+
+  return { unHashedOTP, hashedOTP, tokenExpiry };
+}
 
 // generate user accessToken and refreshToken
 const generateAccessAndRefereshTokens = async (userId) => {
@@ -192,4 +217,52 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, { accessToken }, "Access token refreshed"));
 });
 
-export { registerUser, loginUser, logoutUser, refreshAccessToken };
+// forgot password request
+const forgotPasswordRequest = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    throw new ApiError(404, "user not found");
+  }
+
+  const { hashedOTP, unHashedOTP, tokenExpiry } = generateTemporaryOTPToken();
+
+  user.forgotPasswordToken = hashedOTP;
+  user.forgotPasswordExpiry = tokenExpiry;
+
+  await user.save({ validateBeforeSave: false });
+
+  const forgotEmail = await sendEmail({
+    email,
+    subject: "Password reset request",
+    htmlContent: forgotPasswordEmailTemplate(user?.name, unHashedOTP),
+    textContent: forgotPasswordPlainTextTemplate(user?.email, unHashedOTP),
+  });
+
+  if (!forgotEmail.success) {
+    throw new ApiError(
+      500,
+      "Something went wrong while sending verification email."
+    );
+  }
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        {},
+        "Password reset mail has been sent on your mail id"
+      )
+    );
+});
+
+export {
+  registerUser,
+  loginUser,
+  logoutUser,
+  refreshAccessToken,
+  forgotPasswordRequest,
+};

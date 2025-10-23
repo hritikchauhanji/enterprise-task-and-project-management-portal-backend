@@ -9,13 +9,13 @@ import { verifyJWT } from "../middlewares/auth.middleware.js";
 import {
   changePasswordValidator,
   updateAccountValidator,
-} from "../utils/validators/user.validator.js";
-import { validate } from "../utils/validators/validate.js";
+} from "../validators/user.validator.js";
+import { validate } from "../validators/validate.js";
 import { upload } from "../middlewares/multer.middleware.js";
 
 const router = Router();
 
-// reset password router
+// change password router
 router.post(
   "/change-password",
   verifyJWT,

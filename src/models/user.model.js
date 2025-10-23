@@ -32,7 +32,7 @@ const userSchema = new Schema(
     role: {
       type: String,
       enum: AvailableUserRoles,
-      default: UserRolesEnum.USER,
+      default: UserRolesEnum.EMPLOYEE,
       required: true,
     },
     googleId: {
@@ -49,6 +49,12 @@ const userSchema = new Schema(
         type: String,
         default: "",
       },
+    },
+    forgotPasswordToken: {
+      type: String,
+    },
+    forgotPasswordExpiry: {
+      type: Date,
     },
     refreshToken: {
       type: String,

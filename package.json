@@ -1,0 +1,19 @@
+{
+  "name": "backend-of-enterprise-task-and-project-management-portal",
+  "version": "1.0.0",
+  "description": "Backend API for Enterprise Task & Project Management Portal",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hritikchauhanji/enterprise-task-and-project-management-portal-backend.git"
+  },
+  "author": "Hritik Chauhan",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hritikchauhanji/enterprise-task-and-project-management-portal-backend/issues"
+  },
+  "homepage": "https://github.com/hritikchauhanji/enterprise-task-and-project-management-portal-backend#readme"
+}

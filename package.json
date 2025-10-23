@@ -2,9 +2,11 @@
   "name": "backend-of-enterprise-task-and-project-management-portal",
   "version": "1.0.0",
   "description": "Backend API for Enterprise Task & Project Management Portal",
-  "main": "index.js",
+  "type": "module",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js"
   },
   "repository": {
     "type": "git",
@@ -15,5 +17,8 @@
   "bugs": {
     "url": "https://github.com/hritikchauhanji/enterprise-task-and-project-management-portal-backend/issues"
   },
-  "homepage": "https://github.com/hritikchauhanji/enterprise-task-and-project-management-portal-backend#readme"
+  "homepage": "https://github.com/hritikchauhanji/enterprise-task-and-project-management-portal-backend#readme",
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
 }

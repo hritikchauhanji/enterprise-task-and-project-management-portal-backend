@@ -41,8 +41,14 @@ const userSchema = new Schema(
       sparse: true, // important
     },
     profileImage: {
-      type: String, // cloudinary url
-      default: "",
+      public_id: {
+        type: String,
+        default: "",
+      },
+      url: {
+        type: String,
+        default: "",
+      },
     },
     refreshToken: {
       type: String,

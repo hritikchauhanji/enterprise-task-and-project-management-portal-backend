@@ -42,12 +42,14 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 
   let profileImageUrl = "";
+  let profileImagePublicId = "";
   const profileImageLocalPath = req.file?.path;
 
   if (profileImageLocalPath) {
     const uploadedImage = await uploadOnCloudinary(profileImageLocalPath);
     if (uploadedImage?.url) {
       profileImageUrl = uploadedImage.url;
+      profileImagePublicId = uploadedImage.public_id;
     }
   }
 
@@ -55,7 +57,10 @@ const registerUser = asyncHandler(async (req, res) => {
     name: name.trim(),
     username: username.trim().toLowerCase(),
     email: email.trim().toLowerCase(),
-    profileImage: profileImageUrl,
+    profileImage: {
+      public_id: profileImagePublicId,
+      url: profileImageUrl,
+    },
     password,
   });
 

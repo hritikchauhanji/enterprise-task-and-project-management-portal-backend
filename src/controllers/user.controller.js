@@ -2,6 +2,10 @@ import { User } from "../models/user.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/apiResponse.js";
+import {
+  uploadOnCloudinary,
+  deleteFromCloudinary,
+} from "../utils/cloudinary.js";
 
 // user change password
 const changeCurrentPassword = asyncHandler(async (req, res) => {
@@ -62,4 +66,65 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, user, "Account details updated successfully"));
 });
 
-export { changeCurrentPassword, getCurrentUser, updateAccountDetails };
+// update user profileImage
+const updateProfileImage = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user?._id);
+
+  if (!user) {
+    throw new ApiError(404, "user does not exists");
+  }
+  const profileImageLocalPath = req.file?.path;
+
+  if (
+    user?.profileImage &&
+    user.profileImage.public_id !== "" &&
+    user.profileImage.url !== ""
+  ) {
+    const deleteOldProfileImage = await deleteFromCloudinary(
+      user?.profileImage?.public_id
+    );
+
+    if (
+      !deleteOldProfileImage ||
+      deleteOldProfileImage.result === "not found"
+    ) {
+      throw new ApiError(500, "Internal server error. Please try again");
+    }
+  }
+
+  let profileImageUrl = "";
+  let profileImagePublicId = "";
+  if (profileImageLocalPath) {
+    const uploadedImage = await uploadOnCloudinary(profileImageLocalPath);
+    if (uploadedImage?.url) {
+      profileImageUrl = uploadedImage.url;
+      profileImagePublicId = uploadedImage.public_id;
+    }
+  }
+
+  const updatedUser = await User.findByIdAndUpdate(
+    req.user?._id,
+    {
+      $set: {
+        profileImage: {
+          public_id: profileImagePublicId,
+          url: profileImageUrl,
+        },
+      },
+    },
+    { new: true }
+  ).select("-password -refreshToken");
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, updatedUser, "Avatar image updated successfully")
+    );
+});
+
+export {
+  changeCurrentPassword,
+  getCurrentUser,
+  updateAccountDetails,
+  updateProfileImage,
+};

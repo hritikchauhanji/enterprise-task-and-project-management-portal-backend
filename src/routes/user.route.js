@@ -3,6 +3,7 @@ import {
   changeCurrentPassword,
   getCurrentUser,
   updateAccountDetails,
+  updateProfileImage,
 } from "../controllers/user.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 import {
@@ -10,6 +11,7 @@ import {
   updateAccountValidator,
 } from "../utils/validators/user.validator.js";
 import { validate } from "../utils/validators/validate.js";
+import { upload } from "../middlewares/multer.middleware.js";
 
 const router = Router();
 
@@ -32,6 +34,14 @@ router.patch(
   updateAccountValidator(),
   validate,
   updateAccountDetails
+);
+
+// update profileImage router
+router.patch(
+  "/update-profile-image",
+  verifyJWT,
+  upload.single("profileImage"),
+  updateProfileImage
 );
 
 export default router;

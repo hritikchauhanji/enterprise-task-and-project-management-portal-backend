@@ -1,4 +1,5 @@
 import express from "express";
+import authRoutes from "./routes/auth.route.js";
 import userRoutes from "./routes/user.route.js";
 import { errorHandler } from "./middlewares/error.middleware.js";
 import cookieParser from "cookie-parser";
@@ -11,7 +12,8 @@ app.use(express.static("public"));
 app.use(cookieParser());
 
 //routes
-app.use("/api/v1/auth", userRoutes);
+app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/user", userRoutes);
 app.use(errorHandler);
 
 export { app };

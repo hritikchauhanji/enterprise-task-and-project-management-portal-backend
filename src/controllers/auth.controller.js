@@ -41,7 +41,6 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 
   const profileImageLocalPath = req.file?.path;
-  console.log(profileImageLocalPath);
 
   const user = await User.create({
     name: name.trim(),

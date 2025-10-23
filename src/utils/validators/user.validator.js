@@ -36,4 +36,21 @@ const userRegisterValidator = () => {
   ];
 };
 
-export { userRegisterValidator };
+const userLoginValidator = () => {
+  return [
+    body("identifier")
+      .trim()
+      .notEmpty()
+      .withMessage("Email or Username is required")
+      .isLength({ min: 4, max: 100 })
+      .withMessage("Identifier must be between 4 and 100 characters"),
+    body("password")
+      .trim()
+      .notEmpty()
+      .withMessage("Password is required")
+      .isLength({ min: 6 })
+      .withMessage("Password must be at least 6 characters"),
+  ];
+};
+
+export { userRegisterValidator, userLoginValidator };

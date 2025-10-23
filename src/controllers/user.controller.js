@@ -40,23 +40,24 @@ const registerUser = asyncHandler(async (req, res) => {
 });
 
 const loginUser = asyncHandler(async (req, res) => {
-  const { email, username, password } = req.body;
-  console.log(email);
+  const { identifier, password } = req.body; // identifier can be email or username
 
-  if (!(username || email)) {
-    throw new ApiError(400, "username or email is required");
+  if (!identifier) {
+    throw new ApiError(400, "Email or Username is required");
   }
 
-  const user = await User.findOne({
-    $or: [{ username }, { email }],
-  });
+  // Check if identifier is email or username
+  const isEmail = identifier.includes("@");
+
+  const user = await User.findOne(
+    isEmail ? { email: identifier } : { username: identifier.toLowerCase() }
+  );
 
   if (!user) {
     throw new ApiError(404, "User does not exist");
   }
 
   const isPasswordValid = await user.isPasswordCorrect(password);
-
   if (!isPasswordValid) {
     throw new ApiError(401, "Invalid user credentials");
   }
@@ -65,15 +66,15 @@ const loginUser = asyncHandler(async (req, res) => {
     "-password -refreshToken"
   );
 
-  return res.status(200).json(
-    new ApiResponse(
-      200,
-      {
-        user: loggedInUser,
-      },
-      "User logged In Successfully"
-    )
-  );
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        { user: loggedInUser },
+        "User logged in successfully"
+      )
+    );
 });
 
 export { registerUser, loginUser };

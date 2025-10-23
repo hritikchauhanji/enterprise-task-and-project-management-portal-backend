@@ -29,4 +29,37 @@ const getCurrentUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, req.user, "Current user fetched successfully"));
 });
 
-export { changeCurrentPassword, getCurrentUser };
+// update account
+const updateAccountDetails = asyncHandler(async (req, res) => {
+  const { name, username, email } = req.body;
+
+  if (!name || !email || !username) {
+    throw new ApiError(400, "All fields are required");
+  }
+
+  const existedUser = await User.findOne({
+    $or: [{ username }, { email }],
+  });
+
+  if (existedUser) {
+    throw new ApiError(409, "User with email or username already exists");
+  }
+
+  const user = await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      $set: {
+        name,
+        username,
+        email,
+      },
+    },
+    { new: true }
+  ).select("-password -refreshToken");
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, user, "Account details updated successfully"));
+});
+
+export { changeCurrentPassword, getCurrentUser, updateAccountDetails };

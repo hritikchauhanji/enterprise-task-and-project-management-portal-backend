@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   loginUser,
   logoutUser,
+  refreshAccessToken,
   registerUser,
 } from "../controllers/user.controller.js";
 import {
@@ -21,5 +22,8 @@ router.post("/login", userLoginValidator(), validate, loginUser);
 
 // logout router
 router.post("/logout", verifyJWT, logoutUser);
+
+// refresh token router
+router.post("/refresh-token", refreshAccessToken);
 
 export default router;

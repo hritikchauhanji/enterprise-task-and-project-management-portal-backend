@@ -4,6 +4,7 @@ import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/apiResponse.js";
 import { USER_COOKIE_EXPIRY } from "../constants.js";
 import jwt from "jsonwebtoken";
+import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
 // generate user accessToken and refreshToken
 const generateAccessAndRefereshTokens = async (userId) => {
@@ -40,13 +41,21 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(409, "User with email or username already exists");
   }
 
+  let profileImageUrl = "";
   const profileImageLocalPath = req.file?.path;
+
+  if (profileImageLocalPath) {
+    const uploadedImage = await uploadOnCloudinary(profileImageLocalPath);
+    if (uploadedImage?.url) {
+      profileImageUrl = uploadedImage.url;
+    }
+  }
 
   const user = await User.create({
     name: name.trim(),
     username: username.trim().toLowerCase(),
     email: email.trim().toLowerCase(),
-    profileImage: profileImageLocalPath,
+    profileImage: profileImageUrl,
     password,
   });
 

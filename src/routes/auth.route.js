@@ -5,11 +5,13 @@ import {
   logoutUser,
   refreshAccessToken,
   registerUser,
+  resetForgottenPassword,
 } from "../controllers/auth.controller.js";
 import {
   userForgotPasswordValidator,
   userLoginValidator,
   userRegisterValidator,
+  userResetForgottenPasswordValidator,
 } from "../validators/auth.validator.js";
 import { validate } from "../validators/validate.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
@@ -42,5 +44,14 @@ router.post(
   validate,
   forgotPasswordRequest
 );
+
+// reset password router
+router
+  .route("/reset-password")
+  .post(
+    userResetForgottenPasswordValidator(),
+    validate,
+    resetForgottenPassword
+  );
 
 export default router;

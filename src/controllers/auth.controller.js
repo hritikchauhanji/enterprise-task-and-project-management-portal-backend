@@ -259,10 +259,38 @@ const forgotPasswordRequest = asyncHandler(async (req, res) => {
     );
 });
 
+// reset password
+const resetForgottenPassword = asyncHandler(async (req, res) => {
+  const { resetCode, newPassword } = req.body;
+
+  const hashedOTP = crypto.createHash("sha256").update(resetCode).digest("hex");
+
+  const user = await User.findOne({
+    forgotPasswordToken: hashedOTP,
+    forgotPasswordExpiry: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    throw new ApiError(400, "code is invalid or expired");
+  }
+
+  user.forgotPasswordToken = undefined;
+  user.forgotPasswordExpiry = undefined;
+
+  user.password = newPassword;
+
+  await user.save({ validateBeforeSave: false });
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, {}, "Password reset successfully"));
+});
+
 export {
   registerUser,
   loginUser,
   logoutUser,
   refreshAccessToken,
   forgotPasswordRequest,
+  resetForgottenPassword,
 };

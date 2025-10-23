@@ -65,8 +65,32 @@ const userForgotPasswordValidator = () => {
   ];
 };
 
+const userResetForgottenPasswordValidator = () => {
+  return [
+    body("resetCode")
+      .trim()
+      .notEmpty()
+      .withMessage("verification code is required")
+      .isLength({ min: 6, max: 6 })
+      .withMessage("Verification code must be exactly 6 characters long")
+      .isNumeric()
+      .withMessage("reset code must be a 6 digit number"),
+    body("newPassword")
+      .trim()
+      .notEmpty()
+      .withMessage("Password is required")
+      .matches(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
+      )
+      .withMessage(
+        "Password must be 8+ chars, with upper, lower, number & special char"
+      ),
+  ];
+};
+
 export {
   userRegisterValidator,
   userLoginValidator,
   userForgotPasswordValidator,
+  userResetForgottenPasswordValidator,
 };

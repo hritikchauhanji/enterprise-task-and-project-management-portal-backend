@@ -89,6 +89,10 @@ const updateProject = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Project not found");
   }
 
+  if (project.createdBy.toString() !== req.user._id.toString()) {
+    throw new ApiError(403, "You are not authorized to delete this project");
+  }
+
   if (
     !name?.trim() ||
     !description?.trim() ||

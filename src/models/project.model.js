@@ -19,6 +19,16 @@ const projectSchema = new Schema(
         ref: "User",
       },
     ],
+    file: {
+      public_id: {
+        type: String,
+        default: "",
+      },
+      url: {
+        type: String,
+        default: "",
+      },
+    },
     createdBy: {
       type: Schema.Types.ObjectId,
       ref: "User",

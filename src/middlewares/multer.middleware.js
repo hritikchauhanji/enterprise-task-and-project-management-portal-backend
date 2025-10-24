@@ -14,7 +14,7 @@ const storage = multer.diskStorage({
   },
 });
 
-// file filter for multer
+// file filter for profileImage
 const fileFilter = (req, file, cb) => {
   const ext = path.extname(file.originalname).toLowerCase();
   if (ext === ".png" || ext === ".jpg" || ext === ".jpeg") {
@@ -24,7 +24,22 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
+// file filter for projectFile
+const fileFilterForProjectFile = (req, file, cb) => {
+  const ext = path.extname(file.originalname).toLowerCase();
+  if (ext === ".pdf" || ext === ".docx") {
+    cb(null, true);
+  } else {
+    cb(new Error("Only PDF or DOCX files are allowed"));
+  }
+};
+
 export const upload = multer({
   storage,
   fileFilter,
+});
+
+export const uploadProjectFile = multer({
+  storage,
+  fileFilterForProjectFile,
 });

@@ -2,7 +2,7 @@ import { Project } from "../models/project.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
-import mongoose from "mongoose";
+import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
 // create project by admin
 const createProject = asyncHandler(async (req, res) => {
@@ -27,11 +27,29 @@ const createProject = asyncHandler(async (req, res) => {
   const [day, month, year] = deadline.split("-");
   const formattedDeadline = new Date(`${year}-${month}-${day}T00:00:00Z`);
 
+  let projectFileUrl = "";
+  let projectFilePublicId = "";
+  const projectFileLocalPath = req.file?.path;
+
+  if (projectFileLocalPath) {
+    const uploadedFile = await uploadOnCloudinary(projectFileLocalPath);
+    if (!uploadedFile.url) {
+      throw new ApiError(400, "Error when project file upload on cloudinary!");
+    } else {
+      projectFileUrl = uploadedFile.url;
+      projectFilePublicId = uploadedFile.public_id;
+    }
+  }
+
   const createdProject = await Project.create({
     name: name.trim(),
     description,
     deadline: formattedDeadline,
     members,
+    file: {
+      public_id: projectFilePublicId,
+      url: projectFileUrl,
+    },
     createdBy: req.user._id,
   });
 
@@ -78,10 +96,6 @@ const getMyProjects = async (req, res) => {
 const updateProject = asyncHandler(async (req, res) => {
   const { projectId } = req.params;
   const { name, description, deadline, members } = req.body;
-
-  if (!mongoose.Types.ObjectId.isValid(projectId)) {
-    throw new ApiError(400, "Invalid project ID");
-  }
 
   const project = await Project.findById(projectId);
 

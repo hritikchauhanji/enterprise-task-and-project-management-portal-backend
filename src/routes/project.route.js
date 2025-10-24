@@ -14,6 +14,7 @@ import {
   updateProjectValidator,
 } from "../validators/project.validator.js";
 import { validate } from "../validators/validate.js";
+import { uploadProjectFile } from "../middlewares/multer.middleware.js";
 
 const router = Router();
 
@@ -22,6 +23,7 @@ router.post(
   "/",
   verifyJWT,
   verifyPermission([UserRolesEnum.ADMIN]),
+  uploadProjectFile.single("projectFile"),
   createProjectValidator(),
   validate,
   createProject

@@ -1,4 +1,4 @@
-import { body } from "express-validator";
+import { body, param } from "express-validator";
 import {
   AvailableTaskPriorities,
   AvailableTaskStatuses,
@@ -47,4 +47,10 @@ const createTaskValidator = () => {
   ];
 };
 
-export { createTaskValidator };
+const getTasksByProjectvalidator = () => {
+  return [
+    param("projectId").isMongoId().withMessage("Invalid project ID format."),
+  ];
+};
+
+export { createTaskValidator, getTasksByProjectvalidator };

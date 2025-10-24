@@ -6,7 +6,7 @@ import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { AvailableTaskPriorities } from "../constants.js";
 
-// create task in assgned project by Empoyee
+// create task in assigned project by Empoyee
 const createTask = asyncHandler(async (req, res) => {
   const { title, description, priority, status, deadline, projectId } =
     req.body;
@@ -46,4 +46,39 @@ const createTask = asyncHandler(async (req, res) => {
     .json(new ApiResponse(201, newTask, "Task created successfully."));
 });
 
-export { createTask };
+// get tasks by assigned project
+const getTasksByProject = asyncHandler(async (req, res) => {
+  const { projectId } = req.params;
+
+  if (!projectId) {
+    throw new ApiError(400, "Project ID is required.");
+  }
+
+  const project = await Project.findById(projectId);
+  if (!project) {
+    throw new ApiError(404, "Project not found.");
+  }
+
+  const isMember = project.members.some(
+    (memberId) => memberId.toString() === req.user._id.toString()
+  );
+
+  if (!isMember) {
+    throw new ApiError(
+      403,
+      "You are not authorized to view tasks for this project."
+    );
+  }
+
+  const tasks = await Task.find({ projectId }).sort({ createdAt: -1 });
+
+  if (!tasks) {
+    throw new ApiError(404, "Tasks not found");
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, tasks, "Tasks fetched successfully."));
+});
+
+export { createTask, getTasksByProject };

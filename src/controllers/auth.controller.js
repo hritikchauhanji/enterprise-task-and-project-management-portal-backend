@@ -69,7 +69,6 @@ const registerUser = asyncHandler(async (req, res) => {
   let profileImageUrl = "";
   let profileImagePublicId = "";
   const profileImageLocalPath = req.file?.path;
-  console.log(profileImageLocalPath);
 
   if (profileImageLocalPath) {
     const uploadedImage = await uploadOnCloudinary(profileImageLocalPath);

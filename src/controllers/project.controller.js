@@ -45,7 +45,7 @@ const createProject = asyncHandler(async (req, res) => {
 
 // get projects by admin
 const getAllProjects = asyncHandler(async (req, res) => {
-  const projects = (await Project.find({ createdBy: req.user._id })).toSorted({
+  const projects = await Project.find({ createdBy: req.user._id }).sort({
     createdAt: -1,
   });
 

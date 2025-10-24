@@ -2,11 +2,28 @@ import { Project } from "../models/project.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
-import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import {
+  deleteFromCloudinary,
+  uploadOnCloudinary,
+} from "../utils/cloudinary.js";
 
 // create project by admin
 const createProject = asyncHandler(async (req, res) => {
-  const { name, description, deadline, members } = req.body;
+  const { name, description, deadline } = req.body;
+  let { members } = req.body;
+
+  if (typeof members === "string") {
+    members = members.trim();
+    if (members.startsWith("[") && members.endsWith("]")) {
+      try {
+        members = JSON.parse(members);
+      } catch {
+        throw new ApiError(400, "Invalid members format, must be a JSON array");
+      }
+    } else {
+      members = [members];
+    }
+  }
 
   if (
     !name?.trim() ||
@@ -95,7 +112,21 @@ const getMyProjects = async (req, res) => {
 // update project by admin
 const updateProject = asyncHandler(async (req, res) => {
   const { projectId } = req.params;
-  const { name, description, deadline, members } = req.body;
+  const { name, description, deadline } = req.body;
+  let { members } = req.body;
+
+  if (typeof members === "string") {
+    members = members.trim();
+    if (members.startsWith("[") && members.endsWith("]")) {
+      try {
+        members = JSON.parse(members);
+      } catch {
+        throw new ApiError(400, "Invalid members format, must be a JSON array");
+      }
+    } else {
+      members = [members];
+    }
+  }
 
   const project = await Project.findById(projectId);
 
@@ -121,6 +152,31 @@ const updateProject = asyncHandler(async (req, res) => {
   const [day, month, year] = deadline.split("-");
   const formattedDeadline = new Date(`${year}-${month}-${day}T00:00:00Z`);
 
+  let projectFileUrl = project.file?.url || "";
+  let projectFilePublicId = project.file?.public_id || "";
+
+  const projectFileLocalPath = req.file?.path;
+
+  if (projectFileLocalPath) {
+    if (projectFilePublicId) {
+      const deleteOldFile = await deleteFromCloudinary(projectFilePublicId);
+      if (!deleteOldFile || deleteOldFile.result === "not found") {
+        throw new ApiError(
+          500,
+          "Error deleting old project file from Cloudinary"
+        );
+      }
+    }
+
+    const uploadedFile = await uploadOnCloudinary(projectFileLocalPath);
+    if (!uploadedFile?.url) {
+      throw new ApiError(400, "Error uploading new project file to Cloudinary");
+    }
+
+    projectFileUrl = uploadedFile.url;
+    projectFilePublicId = uploadedFile.public_id;
+  }
+
   const updatedProject = await Project.findByIdAndUpdate(
     projectId,
     {
@@ -129,6 +185,10 @@ const updateProject = asyncHandler(async (req, res) => {
         description,
         deadline: formattedDeadline,
         members,
+        file: {
+          public_id: projectFilePublicId,
+          url: projectFileUrl,
+        },
       },
     },
     { new: true }

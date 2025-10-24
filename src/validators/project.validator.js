@@ -25,13 +25,38 @@ const createProjectValidator = () => {
       .matches(/^(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[0-2])-\d{4}$/)
       .withMessage("Deadline must be in format dd-mm-yyyy (e.g., 30-10-2025)"),
 
-    body("members")
-      .isArray({ min: 1 })
-      .withMessage("Members must be an array with at least one member")
-      .custom((arr) =>
-        arr.every((m) => typeof m === "string" && m.trim() !== "")
-      )
-      .withMessage("Each member must be a non-empty string"),
+    body("members").custom((value) => {
+      let membersArray;
+
+      if (typeof value === "string") {
+        value = value.trim();
+        if (value.startsWith("[") && value.endsWith("]")) {
+          try {
+            membersArray = JSON.parse(value);
+          } catch {
+            throw new Error("Members must be a valid JSON array");
+          }
+        } else {
+          membersArray = [value];
+        }
+      } else if (Array.isArray(value)) {
+        membersArray = value;
+      } else {
+        throw new Error("Members must be a string or an array");
+      }
+
+      if (membersArray.length === 0) {
+        throw new Error("Members must have at least one member");
+      }
+
+      if (
+        !membersArray.every((m) => typeof m === "string" && m.trim() !== "")
+      ) {
+        throw new Error("Each member must be a non-empty string");
+      }
+
+      return true;
+    }),
   ];
 };
 
@@ -67,12 +92,38 @@ const updateProjectValidator = () => {
 
     body("members")
       .optional()
-      .isArray({ min: 1 })
-      .withMessage("Members must be an array with at least one member")
-      .custom((arr) =>
-        arr.every((m) => typeof m === "string" && m.trim() !== "")
-      )
-      .withMessage("Each member must be a non-empty string"),
+      .custom((value) => {
+        let membersArray;
+
+        if (typeof value === "string") {
+          value = value.trim();
+          if (value.startsWith("[") && value.endsWith("]")) {
+            try {
+              membersArray = JSON.parse(value);
+            } catch {
+              throw new Error("Members must be a valid JSON array");
+            }
+          } else {
+            membersArray = [value];
+          }
+        } else if (Array.isArray(value)) {
+          membersArray = value;
+        } else {
+          throw new Error("Members must be a string or an array");
+        }
+
+        if (membersArray.length === 0) {
+          throw new Error("Members must have at least one member");
+        }
+
+        if (
+          !membersArray.every((m) => typeof m === "string" && m.trim() !== "")
+        ) {
+          throw new Error("Each member must be a non-empty string");
+        }
+
+        return true;
+      }),
   ];
 };
 

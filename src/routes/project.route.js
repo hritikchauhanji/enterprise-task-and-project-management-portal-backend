@@ -50,6 +50,7 @@ router.patch(
   "/:projectId",
   verifyJWT,
   verifyPermission([UserRolesEnum.ADMIN]),
+  uploadProjectFile.single("projectFile"),
   updateProjectValidator(),
   validate,
   updateProject

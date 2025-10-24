@@ -137,4 +137,35 @@ const updateTask = asyncHandler(async (req, res) => {
     );
 });
 
-export { createTask, getTasksByProject, updateTask };
+// delete task by Id
+const deleteTask = asyncHandler(async (req, res) => {
+  const { taskId } = req.params;
+
+  const task = await Task.findById(taskId);
+  if (!task) {
+    throw new ApiError(404, "Task not found.");
+  }
+
+  const project = await Project.findById(task.projectId);
+  if (!project) {
+    throw new ApiError(404, "Project not found.");
+  }
+
+  const isAllowed =
+    task.assignee.toString() === req.user._id.toString() ||
+    project.members.some(
+      (memberId) => memberId.toString() === req.user._id.toString()
+    );
+
+  if (!isAllowed) {
+    throw new ApiError(403, "You are not authorized to delete this task.");
+  }
+
+  await task.deleteOne();
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, {}, "Task deleted successfully."));
+});
+
+export { createTask, getTasksByProject, updateTask, deleteTask };

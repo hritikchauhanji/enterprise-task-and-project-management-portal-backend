@@ -89,4 +89,13 @@ const updateTaskValidator = () => {
   ];
 };
 
-export { createTaskValidator, getTasksByProjectvalidator, updateTaskValidator };
+const deleteTaskValidator = () => {
+  return [param("taskId").isMongoId().withMessage("Invalid taskId format")];
+};
+
+export {
+  createTaskValidator,
+  getTasksByProjectvalidator,
+  updateTaskValidator,
+  deleteTaskValidator,
+};

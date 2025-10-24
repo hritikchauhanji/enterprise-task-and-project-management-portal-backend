@@ -1,8 +1,9 @@
 import { Router } from "express";
-import { verifyJWT } from "../middlewares/auth.middleware.js";
+import { verifyJWT, verifyPermission } from "../middlewares/auth.middleware.js";
 import {
   createTask,
   deleteTask,
+  getAllTasksByAdmin,
   getTasksByProject,
   updateTask,
 } from "../controllers/task.controller.js";
@@ -13,6 +14,7 @@ import {
   updateTaskValidator,
 } from "../validators/task.validator.js";
 import { validate } from "../validators/validate.js";
+import { UserRolesEnum } from "../constants.js";
 
 const router = Router();
 
@@ -44,6 +46,14 @@ router.delete(
   deleteTaskValidator(),
   validate,
   deleteTask
+);
+
+// get all tasks by admin router
+router.get(
+  "/",
+  verifyJWT,
+  verifyPermission([UserRolesEnum.ADMIN]),
+  getAllTasksByAdmin
 );
 
 export default router;

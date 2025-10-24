@@ -168,4 +168,22 @@ const deleteTask = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "Task deleted successfully."));
 });
 
-export { createTask, getTasksByProject, updateTask, deleteTask };
+// get all tasks by admin
+const getAllTasksByAdmin = asyncHandler(async (_, res) => {
+  const tasks = await Task.find()
+    .populate("assignee", "name email username")
+    .populate("projectId", "name description")
+    .sort({ createdAt: -1 });
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, tasks, "All tasks fetched successfully."));
+});
+
+export {
+  createTask,
+  getTasksByProject,
+  updateTask,
+  deleteTask,
+  getAllTasksByAdmin,
+};

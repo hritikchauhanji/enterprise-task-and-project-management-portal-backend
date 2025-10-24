@@ -1,4 +1,4 @@
-import { body } from "express-validator";
+import { body, param } from "express-validator";
 
 const changePasswordValidator = () => {
   return [
@@ -47,4 +47,8 @@ const updateAccountValidator = () => {
   ];
 };
 
-export { changePasswordValidator, updateAccountValidator };
+const deleteUserValidator = () => {
+  return [param("userId").isMongoId().withMessage("Invalid userId format")];
+};
+
+export { changePasswordValidator, updateAccountValidator, deleteUserValidator };

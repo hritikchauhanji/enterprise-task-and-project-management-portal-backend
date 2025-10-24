@@ -127,9 +127,42 @@ const updateProfileImage = asyncHandler(async (req, res) => {
     );
 });
 
+// delete user by admin
+const deleteUser = asyncHandler(async (req, res) => {
+  const { userId } = req.params;
+
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  if (user.profileImage && user.profileImage.public_id) {
+    const deleteImage = await deleteFromCloudinary(user.profileImage.public_id);
+    if (!deleteImage || deleteImage.result === "not found") {
+      throw new ApiError(
+        500,
+        "Error deleting user profile image from Cloudinary"
+      );
+    }
+  }
+
+  await User.findByIdAndDelete(userId);
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        null,
+        `User "${user.username}" has been deleted successfully`
+      )
+    );
+});
+
 export {
   changeCurrentPassword,
   getCurrentUser,
   updateAccountDetails,
   updateProfileImage,
+  deleteUser,
 };

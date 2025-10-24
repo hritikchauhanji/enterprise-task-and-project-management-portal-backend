@@ -1,17 +1,20 @@
 import { Router } from "express";
 import {
   changeCurrentPassword,
+  deleteUser,
   getCurrentUser,
   updateAccountDetails,
   updateProfileImage,
 } from "../controllers/user.controller.js";
-import { verifyJWT } from "../middlewares/auth.middleware.js";
+import { verifyJWT, verifyPermission } from "../middlewares/auth.middleware.js";
 import {
   changePasswordValidator,
+  deleteUserValidator,
   updateAccountValidator,
 } from "../validators/user.validator.js";
 import { validate } from "../validators/validate.js";
 import { upload } from "../middlewares/multer.middleware.js";
+import { UserRolesEnum } from "../constants.js";
 
 const router = Router();
 
@@ -42,6 +45,16 @@ router.patch(
   verifyJWT,
   upload.single("profileImage"),
   updateProfileImage
+);
+
+// delete user by admin router
+router.delete(
+  "/:userId",
+  verifyJWT,
+  verifyPermission([UserRolesEnum.ADMIN]),
+  deleteUserValidator(),
+  validate,
+  deleteUser
 );
 
 export default router;

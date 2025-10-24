@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   createProject,
   getAllProjects,
+  getMyProjects,
 } from "../controllers/project.controller.js";
 import { verifyJWT, verifyPermission } from "../middlewares/auth.middleware.js";
 import { UserRolesEnum } from "../constants.js";
@@ -26,6 +27,14 @@ router.get(
   verifyJWT,
   verifyPermission([UserRolesEnum.ADMIN]),
   getAllProjects
+);
+
+// get all project router by employee which assign by admin
+router.get(
+  "/user",
+  verifyJWT,
+  verifyPermission([UserRolesEnum.EMPLOYEE]),
+  getMyProjects
 );
 
 export default router;

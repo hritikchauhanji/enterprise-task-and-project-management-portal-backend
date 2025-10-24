@@ -58,4 +58,19 @@ const getAllProjects = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, projects, "Projects fetched successfully"));
 });
 
-export { createProject, getAllProjects };
+// get projects by employee which assign by admin
+const getMyProjects = async (req, res) => {
+  const projects = await Project.find({ members: req.user._id }).sort({
+    createdAt: -1,
+  });
+
+  if (!projects) {
+    throw new ApiError(404, "No Project found for this user");
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, projects, "Projects fetched successfully"));
+};
+
+export { createProject, getAllProjects, getMyProjects };

@@ -1,12 +1,17 @@
 import { Router } from "express";
 import {
   createProject,
+  deleteProject,
   getAllProjects,
   getMyProjects,
+  updateProject,
 } from "../controllers/project.controller.js";
 import { verifyJWT, verifyPermission } from "../middlewares/auth.middleware.js";
 import { UserRolesEnum } from "../constants.js";
-import { createProjectValidator } from "../validators/project.validator.js";
+import {
+  createProjectValidator,
+  updateProjectValidator,
+} from "../validators/project.validator.js";
 import { validate } from "../validators/validate.js";
 
 const router = Router();
@@ -35,6 +40,24 @@ router.get(
   verifyJWT,
   verifyPermission([UserRolesEnum.EMPLOYEE]),
   getMyProjects
+);
+
+//update project by admin
+router.patch(
+  "/:projectId",
+  verifyJWT,
+  verifyPermission([UserRolesEnum.ADMIN]),
+  updateProjectValidator(),
+  validate,
+  updateProject
+);
+
+// delete project by admin
+router.delete(
+  "/:projectId",
+  verifyJWT,
+  verifyPermission([UserRolesEnum.ADMIN]),
+  deleteProject
 );
 
 export default router;

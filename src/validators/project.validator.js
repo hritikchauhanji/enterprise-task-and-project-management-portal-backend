@@ -1,6 +1,6 @@
-import { body } from "express-validator";
+import { body, param } from "express-validator";
 
-export const createProjectValidator = () => {
+const createProjectValidator = () => {
   return [
     body("name")
       .trim()
@@ -35,8 +35,10 @@ export const createProjectValidator = () => {
   ];
 };
 
-export const updateProjectValidator = () => {
+const updateProjectValidator = () => {
   return [
+    param("projectId").isMongoId().withMessage("Invalid projectId format"),
+
     body("name")
       .optional()
       .trim()
@@ -72,4 +74,16 @@ export const updateProjectValidator = () => {
       )
       .withMessage("Each member must be a non-empty string"),
   ];
+};
+
+const deleteProjectValidator = () => {
+  return [
+    param("projectId").isMongoId().withMessage("Invalid projectId format"),
+  ];
+};
+
+export {
+  createProjectValidator,
+  updateProjectValidator,
+  deleteProjectValidator,
 };

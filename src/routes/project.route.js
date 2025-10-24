@@ -10,6 +10,7 @@ import { verifyJWT, verifyPermission } from "../middlewares/auth.middleware.js";
 import { UserRolesEnum } from "../constants.js";
 import {
   createProjectValidator,
+  deleteProjectValidator,
   updateProjectValidator,
 } from "../validators/project.validator.js";
 import { validate } from "../validators/validate.js";
@@ -57,6 +58,8 @@ router.delete(
   "/:projectId",
   verifyJWT,
   verifyPermission([UserRolesEnum.ADMIN]),
+  deleteProjectValidator(),
+  validate,
   deleteProject
 );
 

@@ -1,5 +1,5 @@
 import { Server } from "socket.io";
-import { verifyJWTSocket } from "./middlewares/authSocket.js";
+import { verifyJWTSocket } from "./middlewares/authSocket.middleware.js";
 import { Chat } from "./models/chat.model.js";
 
 const initSocketServer = (server) => {

@@ -1,9 +1,9 @@
 import express from "express";
-import authRoutes from "./routes/auth.route.js";
-import userRoutes from "./routes/user.route.js";
-import projectRoutes from "./routes/project.route.js";
-import healthcheckRouter from "./routes/healthcheck.route.js";
-import taskRoutes from "./routes/task.route.js";
+import authRoutes from "./routes/auth.routes.js";
+import userRoutes from "./routes/user.routes.js";
+import projectRoutes from "./routes/project.routes.js";
+import healthcheckRouter from "./routes/healthcheck.routes.js";
+import taskRoutes from "./routes/task.routes.js";
 import { errorHandler } from "./middlewares/error.middleware.js";
 import cookieParser from "cookie-parser";
 

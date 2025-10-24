@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   changeCurrentPassword,
   deleteUser,
+  getAllUsers,
   getCurrentUser,
   updateAccountDetails,
   updateProfileImage,
@@ -10,6 +11,7 @@ import { verifyJWT, verifyPermission } from "../middlewares/auth.middleware.js";
 import {
   changePasswordValidator,
   deleteUserValidator,
+  getAllUsersValidator,
   updateAccountValidator,
 } from "../validators/user.validator.js";
 import { validate } from "../validators/validate.js";
@@ -55,6 +57,16 @@ router.delete(
   deleteUserValidator(),
   validate,
   deleteUser
+);
+
+// get all users by admin router
+router.get(
+  "/",
+  verifyJWT,
+  verifyPermission([UserRolesEnum.ADMIN]),
+  getAllUsersValidator(),
+  validate,
+  getAllUsers
 );
 
 export default router;

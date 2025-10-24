@@ -159,10 +159,40 @@ const deleteUser = asyncHandler(async (req, res) => {
     );
 });
 
+// get all users by admin
+const getAllUsers = asyncHandler(async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const skip = (page - 1) * limit;
+
+  const users = await User.find()
+    .select("-password -refreshToken")
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit);
+
+  if (!users || users.length === 0) {
+    throw new ApiError(404, "No users found");
+  }
+
+  const totalUsers = await User.countDocuments();
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        { users, totalUsers, page, limit },
+        "Users fetched successfully"
+      )
+    );
+});
+
 export {
   changeCurrentPassword,
   getCurrentUser,
   updateAccountDetails,
   updateProfileImage,
   deleteUser,
+  getAllUsers,
 };

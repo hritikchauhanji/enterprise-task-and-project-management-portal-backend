@@ -1,4 +1,4 @@
-import { body, param } from "express-validator";
+import { body, param, query } from "express-validator";
 
 const changePasswordValidator = () => {
   return [
@@ -51,4 +51,22 @@ const deleteUserValidator = () => {
   return [param("userId").isMongoId().withMessage("Invalid userId format")];
 };
 
-export { changePasswordValidator, updateAccountValidator, deleteUserValidator };
+const getAllUsersValidator = () => {
+  return [
+    query("page")
+      .optional()
+      .isInt({ min: 1 })
+      .withMessage("Page must be an integer greater than 0"),
+    query("limit")
+      .optional()
+      .isInt({ min: 1 })
+      .withMessage("Limit must be an integer greater than 0"),
+  ];
+};
+
+export {
+  changePasswordValidator,
+  updateAccountValidator,
+  deleteUserValidator,
+  getAllUsersValidator,
+};

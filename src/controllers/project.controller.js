@@ -207,10 +207,6 @@ const updateProject = asyncHandler(async (req, res) => {
 const deleteProject = asyncHandler(async (req, res) => {
   const { projectId } = req.params;
 
-  if (!mongoose.Types.ObjectId.isValid(projectId)) {
-    throw new ApiError(400, "Invalid project ID");
-  }
-
   const project = await Project.findById(projectId);
   if (!project) {
     throw new ApiError(404, "Project not found");
@@ -218,6 +214,13 @@ const deleteProject = asyncHandler(async (req, res) => {
 
   if (project.createdBy.toString() !== req.user._id.toString()) {
     throw new ApiError(403, "You are not authorized to delete this project");
+  }
+
+  if (project.file && project.file.public_id) {
+    const deleteFile = await deleteFromCloudinary(project.file.public_id);
+    if (!deleteFile || deleteFile.result === "not found") {
+      throw new ApiError(500, "Error deleting project file from Cloudinary");
+    }
   }
 
   await Project.findByIdAndDelete(projectId);

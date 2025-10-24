@@ -3,7 +3,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 
-// create project
+// create project by admin
 const createProject = asyncHandler(async (req, res) => {
   const { name, description, deadline, members } = req.body;
 
@@ -43,4 +43,19 @@ const createProject = asyncHandler(async (req, res) => {
     .json(new ApiResponse(201, createdProject, "Project Created Successfully"));
 });
 
-export { createProject };
+// get projects by admin
+const getAllProjects = asyncHandler(async (req, res) => {
+  const projects = (await Project.find({ createdBy: req.user._id })).toSorted({
+    createdAt: -1,
+  });
+
+  if (!projects) {
+    throw new ApiError(404, "No Project found for this admin");
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, projects, "Projects fetched successfully"));
+});
+
+export { createProject, getAllProjects };

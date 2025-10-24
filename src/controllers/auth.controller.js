@@ -1,7 +1,7 @@
 import { User } from "../models/user.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/apiError.js";
-import { ApiResponse } from "../utils/apiResponse.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
 import {
   USER_COOKIE_EXPIRY,
   USER_TEMPORARY_TOKEN_EXPIRY,
@@ -69,10 +69,13 @@ const registerUser = asyncHandler(async (req, res) => {
   let profileImageUrl = "";
   let profileImagePublicId = "";
   const profileImageLocalPath = req.file?.path;
+  console.log(profileImageLocalPath);
 
   if (profileImageLocalPath) {
     const uploadedImage = await uploadOnCloudinary(profileImageLocalPath);
-    if (uploadedImage?.url) {
+    if (!uploadedImage.url) {
+      throw new ApiError(400, "Error when profile image upload on cloudinary!");
+    } else {
       profileImageUrl = uploadedImage.url;
       profileImagePublicId = uploadedImage.public_id;
     }

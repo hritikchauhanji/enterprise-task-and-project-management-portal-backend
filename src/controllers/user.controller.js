@@ -1,7 +1,7 @@
 import { User } from "../models/user.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/apiError.js";
-import { ApiResponse } from "../utils/apiResponse.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
 import {
   uploadOnCloudinary,
   deleteFromCloudinary,
@@ -99,7 +99,9 @@ const updateProfileImage = asyncHandler(async (req, res) => {
   let profileImagePublicId = "";
   if (profileImageLocalPath) {
     const uploadedImage = await uploadOnCloudinary(profileImageLocalPath);
-    if (uploadedImage?.url) {
+    if (!uploadedImage.url) {
+      throw new ApiError(400, "Error when profile image upload on cloudinary!");
+    } else {
       profileImageUrl = uploadedImage.url;
       profileImagePublicId = uploadedImage.public_id;
     }

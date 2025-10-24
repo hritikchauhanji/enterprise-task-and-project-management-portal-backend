@@ -53,4 +53,40 @@ const getTasksByProjectvalidator = () => {
   ];
 };
 
-export { createTaskValidator, getTasksByProjectvalidator };
+const updateTaskValidator = () => {
+  return [
+    param("taskId").isMongoId().withMessage("Invalid taskId format"),
+
+    body("title")
+      .optional()
+      .isLength({ min: 6, max: 100 })
+      .withMessage("Title must be between 6 and 100 characters"),
+
+    body("description")
+      .optional()
+      .isLength({ min: 5 })
+      .withMessage("Description must be at least 5 characters"),
+
+    body("priority")
+      .optional()
+      .isIn(AvailableTaskPriorities)
+      .withMessage(
+        `Priority must be one of: ${AvailableTaskPriorities.join(", ")}`
+      ),
+
+    body("status")
+      .optional()
+      .isIn(AvailableTaskStatuses)
+      .withMessage(
+        `Status must be one of: ${AvailableTaskStatuses.join(", ")}`
+      ),
+
+    body("deadline")
+      .optional()
+      .trim()
+      .matches(/^(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[0-2])-\d{4}$/)
+      .withMessage("Deadline must be in format dd-mm-yyyy (e.g., 30-10-2025)"),
+  ];
+};
+
+export { createTaskValidator, getTasksByProjectvalidator, updateTaskValidator };

@@ -3,10 +3,12 @@ import { verifyJWT } from "../middlewares/auth.middleware.js";
 import {
   createTask,
   getTasksByProject,
+  updateTask,
 } from "../controllers/task.controller.js";
 import {
   createTaskValidator,
   getTasksByProjectvalidator,
+  updateTaskValidator,
 } from "../validators/task.validator.js";
 import { validate } from "../validators/validate.js";
 
@@ -22,6 +24,14 @@ router.get(
   getTasksByProjectvalidator(),
   validate,
   getTasksByProject
+);
+
+router.patch(
+  "/:taskId",
+  verifyJWT,
+  updateTaskValidator(),
+  validate,
+  updateTask
 );
 
 export default router;

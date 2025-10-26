@@ -4,6 +4,7 @@ import {
   deleteProject,
   getAllProjects,
   getMyProjects,
+  getProject,
   updateProject,
 } from "../controllers/project.controller.js";
 import { verifyJWT, verifyPermission } from "../middlewares/auth.middleware.js";
@@ -11,6 +12,7 @@ import { UserRolesEnum } from "../constants.js";
 import {
   createProjectValidator,
   deleteProjectValidator,
+  getProjectValidator,
   updateProjectValidator,
 } from "../validators/project.validator.js";
 import { validate } from "../validators/validate.js";
@@ -64,6 +66,15 @@ router.delete(
   deleteProjectValidator(),
   validate,
   deleteProject
+);
+
+// get project by id
+router.get(
+  "/:projectId",
+  verifyJWT,
+  getProjectValidator(),
+  validate,
+  getProject
 );
 
 export default router;

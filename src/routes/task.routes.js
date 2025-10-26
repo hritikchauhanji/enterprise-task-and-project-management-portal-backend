@@ -5,6 +5,7 @@ import {
   deleteTask,
   getAllTasksByAdmin,
   getTasksByProject,
+  getTasksByUser,
   updateTask,
 } from "../controllers/task.controller.js";
 import {
@@ -55,5 +56,8 @@ router.get(
   verifyPermission([UserRolesEnum.ADMIN]),
   getAllTasksByAdmin
 );
+
+// get all tasks by (assignee) user router
+router.get("/user", verifyJWT, getTasksByUser);
 
 export default router;

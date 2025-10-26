@@ -14,8 +14,8 @@ const createProjectValidator = () => {
       .trim()
       .notEmpty()
       .withMessage("Project description is required")
-      .isLength({ min: 100, max: 5000 })
-      .withMessage("Description must be between 100 and 5000 characters")
+      .isLength({ min: 20, max: 500 })
+      .withMessage("Description must be between 20 and 500 characters")
       .escape(),
 
     body("deadline")
@@ -78,8 +78,8 @@ const updateProjectValidator = () => {
       .trim()
       .notEmpty()
       .withMessage("Project description cannot be empty")
-      .isLength({ min: 100, max: 5000 })
-      .withMessage("Description must be between 100 and 5000 characters")
+      .isLength({ min: 20, max: 500 })
+      .withMessage("Description must be between 20 and 500 characters")
       .escape(),
 
     body("deadline")
@@ -132,9 +132,15 @@ const deleteProjectValidator = () => {
     param("projectId").isMongoId().withMessage("Invalid projectId format"),
   ];
 };
+const getProjectValidator = () => {
+  return [
+    param("projectId").isMongoId().withMessage("Invalid projectId format"),
+  ];
+};
 
 export {
   createProjectValidator,
   updateProjectValidator,
   deleteProjectValidator,
+  getProjectValidator,
 };

@@ -162,7 +162,7 @@ const updateProject = asyncHandler(async (req, res) => {
       const deleteOldFile = await deleteFromCloudinary(projectFilePublicId);
       if (!deleteOldFile || deleteOldFile.result === "not found") {
         throw new ApiError(
-          500,
+          400,
           "Error deleting old project file from Cloudinary"
         );
       }
@@ -236,10 +236,45 @@ const deleteProject = asyncHandler(async (req, res) => {
     );
 });
 
+// get project by Id
+const getProject = asyncHandler(async (req, res) => {
+  const { projectId } = req.params;
+
+  const project = await Project.findById(projectId);
+  if (!project) {
+    throw new ApiError(404, "Project not found");
+  }
+
+  const userId = req.user._id.toString();
+
+  const isCreator = project.createdBy.toString() === userId;
+  const isMember = project.members.some(
+    (memberId) => memberId.toString() === userId
+  );
+
+  if (!isCreator && !isMember) {
+    throw new ApiError(403, "You are not authorized to view this project");
+  }
+  const populatedProject = await Project.findById(projectId)
+    .populate("members", "email")
+    .populate("createdBy", "email");
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        populatedProject,
+        `Project has been fetch successfully`
+      )
+    );
+});
+
 export {
   createProject,
   getAllProjects,
   getMyProjects,
   updateProject,
   deleteProject,
+  getProject,
 };

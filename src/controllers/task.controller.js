@@ -57,9 +57,10 @@ const getTasksByProject = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Project not found.");
   }
 
-  const isMember = project.members.some(
-    (memberId) => memberId.toString() === req.user._id.toString()
-  );
+  const isMember =
+    project.members.some(
+      (memberId) => memberId.toString() === req.user._id.toString()
+    ) || project.createdBy.toString() === req.user._id.toString();
 
   if (!isMember) {
     throw new ApiError(
@@ -68,7 +69,9 @@ const getTasksByProject = asyncHandler(async (req, res) => {
     );
   }
 
-  const tasks = await Task.find({ projectId }).sort({ createdAt: -1 });
+  const tasks = await Task.find({ projectId })
+    .populate("assignee", "email")
+    .sort({ createdAt: -1 });
 
   if (!tasks) {
     throw new ApiError(404, "Tasks not found");
@@ -180,10 +183,23 @@ const getAllTasksByAdmin = asyncHandler(async (_, res) => {
     .json(new ApiResponse(200, tasks, "All tasks fetched successfully."));
 });
 
+// get all tasks assigned to the logged-in user
+const getTasksByUser = asyncHandler(async (req, res) => {
+  const tasks = await Task.find({ assignee: req.user._id }).sort({
+    createdAt: -1,
+  });
+  console.log(tasks);
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, tasks, "Tasks fetched successfully."));
+});
+
 export {
   createTask,
   getTasksByProject,
   updateTask,
   deleteTask,
   getAllTasksByAdmin,
+  getTasksByUser,
 };

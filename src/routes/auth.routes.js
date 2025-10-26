@@ -9,7 +9,6 @@ import {
 } from "../controllers/auth.controller.js";
 import {
   userForgotPasswordValidator,
-  userLoginValidator,
   userRegisterValidator,
   userResetForgottenPasswordValidator,
 } from "../validators/auth.validator.js";
@@ -29,7 +28,7 @@ router.post(
 );
 
 // login router
-router.post("/login", userLoginValidator(), validate, loginUser);
+router.post("/login", loginUser);
 
 // logout router
 router.post("/logout", verifyJWT, logoutUser);

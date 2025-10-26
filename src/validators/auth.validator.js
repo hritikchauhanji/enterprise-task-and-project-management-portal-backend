@@ -6,27 +6,34 @@ const userRegisterValidator = () => {
       .trim()
       .notEmpty()
       .withMessage("Name is required")
+      .bail()
       .isLength({ min: 6, max: 50 })
       .withMessage("Name must be between 6 and 50 characters")
       .escape(),
+
     body("username")
       .trim()
       .notEmpty()
       .withMessage("Username is required")
+      .bail()
       .isLength({ min: 6, max: 50 })
       .withMessage("Username must be between 6 and 50 characters")
       .escape(),
+
     body("email")
       .trim()
       .notEmpty()
       .withMessage("Email is required")
+      .bail()
       .isEmail()
       .withMessage("Email format: abcd@example.com")
       .normalizeEmail(),
+
     body("password")
       .trim()
       .notEmpty()
       .withMessage("Password is required")
+      .bail()
       .matches(
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
       )
@@ -36,29 +43,13 @@ const userRegisterValidator = () => {
   ];
 };
 
-const userLoginValidator = () => {
-  return [
-    body("identifier")
-      .trim()
-      .notEmpty()
-      .withMessage("Email or Username is required")
-      .isLength({ min: 4, max: 100 })
-      .withMessage("Identifier must be between 4 and 100 characters"),
-    body("password")
-      .trim()
-      .notEmpty()
-      .withMessage("Password is required")
-      .isLength({ min: 6 })
-      .withMessage("Password must be at least 6 characters"),
-  ];
-};
-
 const userForgotPasswordValidator = () => {
   return [
     body("email")
       .trim()
       .notEmpty()
       .withMessage("Email is required")
+      .bail()
       .isEmail()
       .withMessage("Email format: abcd@example.com")
       .normalizeEmail(),
@@ -70,15 +61,19 @@ const userResetForgottenPasswordValidator = () => {
     body("resetCode")
       .trim()
       .notEmpty()
-      .withMessage("verification code is required")
+      .withMessage("Verification code is required")
+      .bail()
       .isLength({ min: 6, max: 6 })
       .withMessage("Verification code must be exactly 6 characters long")
+      .bail()
       .isNumeric()
-      .withMessage("reset code must be a 6 digit number"),
+      .withMessage("Reset code must be a 6-digit number"),
+
     body("newPassword")
       .trim()
       .notEmpty()
       .withMessage("Password is required")
+      .bail()
       .matches(
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
       )
@@ -90,7 +85,6 @@ const userResetForgottenPasswordValidator = () => {
 
 export {
   userRegisterValidator,
-  userLoginValidator,
   userForgotPasswordValidator,
   userResetForgottenPasswordValidator,
 };

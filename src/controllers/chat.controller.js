@@ -1,7 +1,7 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { Chat } from "../models/chat.model.js";
 import { Project } from "../models/project.model.js";
-import { ApiError } from "../utils/apiError.js";
+import { ApiError } from "../utils/ApiError.js";
 import { UserRolesEnum } from "../constants.js";
 
 // get messages for a project

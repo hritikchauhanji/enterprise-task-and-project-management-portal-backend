@@ -25,7 +25,7 @@ app.use(express.static("public"));
 app.use(cookieParser());
 
 //routes
-app.use("/api/v1", healthcheckRouter);
+app.use("", healthcheckRouter);
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/project", projectRoutes);
